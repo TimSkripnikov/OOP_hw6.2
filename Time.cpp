@@ -1,5 +1,4 @@
 #include "Time.hpp"
-#include <stdexcept>
 
 unsigned Time::count = 0;
 
@@ -11,11 +10,6 @@ Time::Time() : hours(0), minutes(0), seconds(0)
 
 Time::Time(int h, int m, int s) : hours(h), minutes(m), seconds(s)
 {
-    if (h < 0 || h >= 24 || m < 0 || m >= 60 || s < 0 || s >= 60)
-    {
-        throw InvalidTimeException();
-    }
-
     Normalize();
     ++count;
     std::cout << "Parameterized constructor called. Current object count: " << count << std::endl;
@@ -75,9 +69,34 @@ void Time::Normalize()
     }
 }
 
-int Time::ToSeconds() const noexcept
+void Time::SetHours(int h)
 {
-    return hours * 3600 + minutes * 60 + seconds;
+    if (h < 0 || h >= 24)
+    {
+        throw InvalidTimeException();
+    }
+    hours = h;
+    Normalize();
+}
+
+void Time::SetMinutes(int m)
+{
+    if (m < 0 || m >= 60)
+    {
+        throw InvalidTimeException();
+    }
+    minutes = m;
+    Normalize();
+}
+
+void Time::SetSeconds(int s)
+{
+    if (s < 0 || s >= 60)
+    {
+        throw InvalidTimeException();
+    }
+    seconds = s;
+    Normalize();
 }
 
 int Time::GetHours() const noexcept
@@ -93,6 +112,11 @@ int Time::GetMinutes() const noexcept
 int Time::GetSeconds() const noexcept
 {
     return seconds;
+}
+
+int Time::ToSeconds() const noexcept
+{
+    return hours * 3600 + minutes * 60 + seconds;
 }
 
 void Time::PrintTime() const noexcept
@@ -112,23 +136,21 @@ Time Time::operator-(const Time &other) const noexcept
     return Time(0, 0, totalSeconds);
 }
 
-Time &Time::operator-=(const Time &other) noexcept
+Time &Time::operator+=(const Time &other) noexcept
 {
-    int totalSeconds = ToSeconds() - other.ToSeconds();
-    *this = Time(0, 0, totalSeconds);
+    *this = *this + other;
     return *this;
 }
 
-Time &Time::operator+=(const Time &other) noexcept
+Time &Time::operator-=(const Time &other) noexcept
 {
-    int totalSeconds = ToSeconds() + other.ToSeconds();
-    *this = Time(0, 0, totalSeconds);
+    *this = *this - other;
     return *this;
 }
 
 Time &Time::operator=(const Time &other) noexcept
 {
-    this->hours = other.hours;
+    hours = other.hours;
     minutes = other.minutes;
     seconds = other.seconds;
     return *this;
